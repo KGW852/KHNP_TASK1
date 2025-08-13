@@ -1,0 +1,17 @@
+librosa==0.11.0
+matplotlib==3.10.3
+mlflow==2.21.3
+mlflow_skinny==2.21.3
+numpy==2.3.2
+pandas==2.3.1
+Pillow==11.3.0
+PyYAML==6.0.1
+PyYAML==6.0.2
+scikit_learn==1.7.1
+scipy==1.16.1
+seaborn==0.13.2
+soundfile==0.13.1
+torch==2.5.1
+torchdiffeq==0.2.5
+torchvision==0.20.1
+tqdm==4.66.5

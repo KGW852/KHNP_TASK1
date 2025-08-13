@@ -1,0 +1,163 @@
+# configs/default.yaml
+
+# experiment set
+exp_name: exp2  # all, exp1, exp2...
+seed: 42
+
+# path
+model:
+  data_name: dongjak
+  model_name: resnet_ae
+  trainer: resnet_ae_trainer.py
+  trainer_fn: ResNetAETrainer
+  evaluator: resnet_ae_evaluator.py
+  evaluator_fn: ResNetAEEvaluator
+  version: 3.0
+  suffix: .pth
+  base_dir: ./logs  # save model base dir
+
+# trainer step parameters
+train:
+  use: True
+
+# evaluator step parameters
+eval:  # not used
+  use: False
+  epoch: [0, 2]  # [-1]: all
+test:
+  use: True
+  epoch: [0, 5]  # [-1]: all
+
+# data parameters
+match_strategy: sequential  # random, sequential
+img_height: 128
+img_width: 64
+train_n_samples: -1  # -1: all
+eval_n_samples: -1
+test_n_samples: 500
+batch_size: 16
+n_workers: 8
+
+# train parameters
+device: cuda
+epochs: 5
+log_every: 1
+save_every: 5
+
+optimizer:
+  type: sgd
+  learning_rate: 5e-3
+  weight_decay: 1e-4  # adam, adamw, sgd, rmsprop
+  momentum: 0.9  # sgd, rmsprop
+
+scheduler:  # steplr, multisteplr, exponentiallr, cosineannealinglr
+  type: steplr
+  step_size: 5
+  gamma: 0.5
+  milestones: [5, 10]
+  t_max: 50
+  eta_min: 0
+
+early_stopper:
+  use: False
+  patience: 3
+  mode: min  # min, max
+  min_delta: 0.0
+  baseline: 0.1  # None, float
+
+# mlflow parameters
+mlflow:
+  use: True
+  tracking_uri: file:./logs/mlruns  # using "file:" save mlruns to local dir
+
+# ae training parameters
+ae:
+  recon_type: mse
+  reduction: mean
+  simsiam_lamda: 1.5
+  svdd_lamda: 0.5
+
+# mlp model parameters
+mlp_ae:
+  in_dim: 1024
+  enc_hidden_dims: [512, 256, 128, 64, 32, 16]
+  enc_latent_dim: 16
+  dec_latent_dim: 16
+  dec_hidden_dims: [32, 64, 128, 256, 512, 1024]
+  out_channels: 2
+  out_seq_len: 512
+  dropout: 0.1
+  use_batch_norm: True
+
+# resnet_ae model parameters
+resnet_ae:
+  channels: 3
+  height: 128
+  width: 64
+  enc_freeze: False
+  enc_latent_dim: 
+  dec_latent_dim: 2048
+  dec_hidden_dims: [512, 256, 128]
+  dropout: 0.1
+  use_batch_norm: True
+
+# tcn model parameters
+tcn:
+  in_channels: 2
+  n_layers: 3
+  filters_base: 4
+  filters_factor: 2
+  kernel_size: 3
+  stride: 2
+  dilation_base: 2
+  dropout: 0.0
+  use_batch_norm: False
+
+# simsiam model & training parameters
+sim:
+  in_dim: 
+  proj_hidden_dim: 512
+  proj_out_dim: 512
+  pred_hidden_dim: 128
+  pred_out_dim: 512
+  warmup_start: 0
+  warmup_end: 0
+
+# deepSVDD model & training parameters
+svdd:
+  in_dim: 512
+  hidden_dims: [256]
+  latent_dim: 512
+  center_param: False
+  radius_param: False
+  dropout: 0.1
+  use_batch_norm: True
+  nu: 0.01
+  reduction: simple  # simple, mean, sum
+  warmup_start: 11
+  warmup_end: 20
+
+# umap parameters
+umap:
+  n_neighbors: 499
+  min_dist: 0.1
+  n_components: 2
+  random_state: 42
+  metric: euclidean
+  boundary_samples: 100
+  fix_reducer: False
+  normalize: True
+  update_stats: True
+
+# pca parameters
+pca:
+  n_components: 2
+  random_state: 42
+  boundary_samples: 1000
+
+# anomaly score metric
+anomaly:
+  method: reconloss  # simsiam, distance, distribution, reconloss
+  recon_type: mse
+  thresholded: 
+  distribution_percentile: 99
