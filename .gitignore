@@ -9,6 +9,8 @@ data/dongjak(original)_girder/
 data/dongjak(spectrogram)/
 data/dongjak(spectrogram)_girder/
 
+data/KHNP(csv)/
+
 # Ignore the Kyoto-2016_AnoShift.tar file
 Kyoto-2016_AnoShift.tar
 
