@@ -7,3 +7,6 @@ class DongJak():
 
 class AnoShift():
     data_name = "anoshift"
+
+class KHNP():
+    data_name = "khnp"

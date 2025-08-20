@@ -1,12 +1,12 @@
 # configs/default.yaml
 
 # experiment set
-exp_name: exp2  # all, exp1, exp2...
+exp_name: exp1  # all, exp1, exp2...
 seed: 42
 
 # path
 model:
-  data_name: dongjak
+  data_name: khnp_v1.0
   model_name: resnet_ae
   trainer: resnet_ae_trainer.py
   trainer_fn: ResNetAETrainer

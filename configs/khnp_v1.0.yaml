@@ -1,0 +1,53 @@
+# configs/khnp_v1.0.yaml
+
+# path
+root_dir: ./data/KHNP(v1.0)
+train:
+  src_dir: ./data/KHNP(v1.0)/train
+eval:
+  src_dir: ./data/KHNP(v1.0)/eval/eval00
+test:
+  src_dir: ./data/KHNP(v1.0)/eval/eval01
+
+# overide default.yaml
+ae:
+  reduction: mean
+
+
+# original data path
+orig_dir:
+  s0_dir: ./data/KHNP(csv)/normal
+  s1_dir: ./data/KHNP(csv)/tq10
+  s2_dir: ./data/KHNP(csv)/tq20
+  s3_dir: ./data/KHNP(csv)/tq30
+  s4_dir: ./data/KHNP(csv)/tq40
+
+# preprocess save path
+train_dir:
+  train: ./data/KHNP(v1.0)/train
+eval_dir:
+  eval00: ./data/KHNP(v1.0)/eval/eval00
+test_dir:
+  eval01: ./data/KHNP(v1.0)/test/eval01
+  eval02: ./data/KHNP(v1.0)/test/eval02
+  eval03: ./data/KHNP(v1.0)/test/eval03
+  eval04: ./data/KHNP(v1.0)/test/eval04
+
+noise:
+  save_dir: ./data/KHNP(csv)
+  src_scale: 1.5
+  tgt_scale: 0.5
+  src_modulation: 0.5
+  tgt_modulation: 0.5
+  src_iter: 1
+  tgt_iter: 5
+
+# preprocess parameters
+preprocess:
+  random_seed: 42
+  sr: 256
+  nsample: 2048
+  n_fft: 512
+  hop_length: 24
+  window: hann
+  nsplit: 860  # normal to eval, eval split ratio(float) or number(int)
