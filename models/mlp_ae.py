@@ -7,12 +7,12 @@ from .modules.decoder import MLPDecoder
 
 class MLPAE(nn.Module):
     """
-    Combine MLPEncoder and MLPDecoder for source/target domain inputs.
+    Combine MLPEncoder and MLPDecoder for source domain inputs.
     Forward:
-        x_s, x_t: (B, C, T)
+        x_s: (B, C, T)
     Returns:
-        e_s, e_t: encoder outputs (latent_dim).
-        x_s_recon, x_t_recon: decoder outputs (B, C, T)
+        e_s: encoder outputs (latent_dim).
+        x_s_recon: decoder outputs (B, C, T)
     """
     def __init__(self,
                  # AE
@@ -45,14 +45,9 @@ class MLPAE(nn.Module):
             dropout=ae_dropout,
             use_batchnorm=ae_use_batchnorm)
         
-    def forward(self, x_s: torch.Tensor, x_t: torch.Tensor):
+    def forward(self, x_s: torch.Tensor):
         e_s = self.encoder(x_s)  # (B, latent_dim)
-        e_t = self.encoder(x_t)
 
         x_s_recon = self.decoder(e_s)  # (B, C, T)
-        x_t_recon = self.decoder(e_t)
-
-        return (
-            e_s, e_t,             # encoder outputs
-            x_s_recon, x_t_recon
-        )
+        
+        return e_s, x_s_recon

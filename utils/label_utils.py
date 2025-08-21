@@ -31,6 +31,22 @@ def get_dongjak_label(file_path):
 def get_anoshift_label(file_path):
     pass
 
+def get_khnp_label(file_path):
+    file_name = os.path.basename(file_path)
+    if 's0' in file_name:
+        return 0
+    elif 's1' in file_name:
+        return 1
+    elif 's2' in file_name:
+        return 2
+    elif 's3' in file_name:
+        return 3
+    elif 's4' in file_name:
+        return 4
+    else:
+        return -1
+
+
 def get_esc50_pseudo_label(file_path: str):
     class_label = get_esc50_label(file_path)
     if class_label in [47, 40]:
