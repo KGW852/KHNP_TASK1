@@ -7,7 +7,7 @@ train:
 eval:
   src_dir: ./data/KHNP(v1.0)/eval/eval00
 test:
-  src_dir: ./data/KHNP(v1.0)/eval/eval01
+  src_dir: ./data/KHNP(v1.0)/test/eval01
 
 # overide default.yaml
 ae:

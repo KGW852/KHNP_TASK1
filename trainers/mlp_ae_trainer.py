@@ -25,15 +25,15 @@ class MLPAETrainer:
 
         # model: ConvergentAE(MLPEncoder + MLPDecoder)
         self.model = MLPAE(
-            enc_in_dim=cfg["mlp"]["in_dim"],
-            enc_hidden_dims=cfg["mlp"]["enc_hidden_dims"],
-            enc_latent_dim=cfg["mlp"]["enc_latent_dim"],
-            dec_latent_dim=cfg["mlp"]["dec_latent_dim"],
-            dec_hidden_dims=cfg["mlp"]["dec_hidden_dims"],
-            dec_out_channels=cfg["mlp"]["out_channels"],
-            dec_out_seq_len=cfg["mlp"]["out_seq_len"],
-            ae_dropout=cfg["mlp"]["dropout"],
-            ae_use_batchnorm=cfg["mlp"]["use_batch_norm"]
+            enc_in_dim=cfg["mlp_ae"]["in_dim"],
+            enc_hidden_dims=cfg["mlp_ae"]["enc_hidden_dims"],
+            enc_latent_dim=cfg["mlp_ae"]["enc_latent_dim"],
+            dec_latent_dim=cfg["mlp_ae"]["dec_latent_dim"],
+            dec_hidden_dims=cfg["mlp_ae"]["dec_hidden_dims"],
+            dec_out_channels=cfg["mlp_ae"]["out_channels"],
+            dec_out_seq_len=cfg["mlp_ae"]["out_seq_len"],
+            ae_dropout=cfg["mlp_ae"]["dropout"],
+            ae_use_batchnorm=cfg["mlp_ae"]["use_batch_norm"]
         ).to(self.device)
 
         # loss, weight param
@@ -66,27 +66,20 @@ class MLPAETrainer:
             self.model.eval()
         total_loss = 0.0
         recons_loss = 0.0
-        recons_loss_s = 0.0
-        recons_loss_t = 0.0
 
         pbar = tqdm(enumerate(train_loader), total=len(train_loader), desc=f"Epoch [{epoch}/{self.epochs}] Train", leave=False)
         for batch_idx, data in pbar:
-            (x_s, y_s, _), (x_t, y_t, _) = data  # x_s, x_t: (B, C, T)
+            x_s, y_s, _ = data  # x_s: (B, C, T)
             x_s = x_s.to(self.device)
             y_s = y_s.to(self.device)
-            x_t = x_t.to(self.device)
-            y_t = y_t.to(self.device)
             
             self.optimizer.zero_grad()
 
             # forward
-            (e_s, e_t, x_s_recon, x_t_recon) = self.model(x_s, x_t)
+            (e_s, x_s_recon) = self.model(x_s)
 
             # loss
-            recon_loss_s = self.recon_criterion(x_s_recon, x_s)  # (pred, target)
-            recon_loss_t = self.recon_criterion(x_t_recon, x_t)
-            recon_loss = 0.5 * (recon_loss_s + recon_loss_t)
-
+            recon_loss = self.recon_criterion(x_s_recon, x_s)  # (pred, target))
             loss = recon_loss
 
             # backprop
@@ -97,21 +90,16 @@ class MLPAETrainer:
             # stats
             total_loss += loss.item()
             recons_loss += recon_loss.item()
-            recons_loss_s += recon_loss_s.item()
-            recons_loss_t += recon_loss_t.item()
             
             # mlflow log: global step
-            if self.mlflow_logger is not None and batch_idx % 67 == 0:
+            if self.mlflow_logger is not None and batch_idx % 1 == 0:
                 global_step = epoch * len(train_loader) + batch_idx
-                self.mlflow_logger.log_metrics({"train_loss_step": loss.item(),"train_recon_loss_step": recon_loss.item(), 
-                                                "train_recon_s_loss_step": recon_loss_s.item(), "train_recon_t_loss_step": recon_loss_t.item(), }, step=global_step)
+                self.mlflow_logger.log_metrics({"train_loss_step": loss.item(),"train_recon_loss_step": recon_loss.item()}, step=global_step)
 
             # tqdm
             pbar.set_postfix({
                 "loss": f"{loss.item():.4f}",
-                "recon": f"{recon_loss.item():.4f}",
-                "recon_s": f"{recon_loss_s.item():.4f}",
-                "recon_t": f"{recon_loss_t.item():.4f}"
+                "recon": f"{recon_loss.item():.4f}"
                 })
         
         # scheduler
@@ -122,19 +110,15 @@ class MLPAETrainer:
         num_batches = len(train_loader)
         avg_loss = total_loss / num_batches
         avg_recon_loss = recons_loss / num_batches
-        avg_recon_loss_s = recons_loss_s / num_batches
-        avg_recon_loss_t = recons_loss_t / num_batches
 
         print(f"[Train] [Epoch {epoch}/{self.epochs}] "
               f"Avg: {avg_loss:.4f} | Recon: {avg_recon_loss:.4f} | "
-              f"Recon_S: {avg_recon_loss_s:.4f} | Recon_T: {avg_recon_loss_t:.4f}")
+              )
 
         if self.mlflow_logger is not None:
             self.mlflow_logger.log_metrics({
                 "train_loss": avg_loss,
-                "train_recon_loss": avg_recon_loss,
-                "train_recon_loss_s": avg_recon_loss_s,
-                "train_recon_loss_t": avg_recon_loss_t
+                "train_recon_loss": avg_recon_loss
             }, step=epoch)
             
         return (avg_loss, avg_recon_loss)
@@ -143,65 +127,49 @@ class MLPAETrainer:
         self.model.eval()
         total_loss = 0.0
         recons_loss = 0.0
-        recons_loss_s = 0.0
-        recons_loss_t = 0.0
 
         pbar = tqdm(enumerate(eval_loader), total=len(eval_loader), desc=f"Epoch [{epoch}/{self.epochs}] Eval", leave=False)
         with torch.no_grad():
             for batch_idx, data in pbar:
-                (x_s, y_s, _), (x_t, y_t, _) = data
+                x_s, y_s, _ = data
                 x_s = x_s.to(self.device)
                 y_s = y_s.to(self.device)
-                x_t = x_t.to(self.device)
-                y_t = y_t.to(self.device)
 
                 # forward
-                (e_s, e_t, x_s_recon, x_t_recon) = self.model(x_s, x_t)
+                (e_s, x_s_recon) = self.model(x_s)
                 
                 # loss
-                recon_loss_s = self.recon_criterion(x_s_recon, x_s)  # (pred, target)
-                recon_loss_t = self.recon_criterion(x_t_recon, x_t)
-                recon_loss = 0.5 * (recon_loss_s + recon_loss_t)
-
+                recon_loss = self.recon_criterion(x_s_recon, x_s)  # (pred, target)
                 loss = recon_loss
 
                 # stats
                 total_loss += loss.item()
                 recons_loss += recon_loss.item()
-                recons_loss_s += recon_loss_s.item()
-                recons_loss_t += recon_loss_t.item()
 
                 # mlflow log: global step
                 if self.mlflow_logger is not None and batch_idx % 1 == 0:
                     global_step = epoch * len(eval_loader) + batch_idx
-                    self.mlflow_logger.log_metrics({"eval_loss_step": loss.item(), "eval_recon_loss_step": recon_loss.item(), 
-                                                    "eval_recon_s_loss_step": recon_loss_s.item(), "eval_recon_t_loss_step": recon_loss_t.item(), }, step=global_step)
+                    self.mlflow_logger.log_metrics({"eval_loss_step": loss.item(), "eval_recon_loss_step": recon_loss.item()}, step=global_step)
                 
                 # tqdm
                 pbar.set_postfix({
                     "loss": f"{loss.item():.4f}",
-                    "recon": f"{recon_loss.item():.4f}",
-                    "recon_s": f"{recon_loss_s.item():.4f}",
-                    "recon_t": f"{recon_loss_t.item():.4f}"
+                    "recon": f"{recon_loss.item():.4f}"
                     })
 
         # calc avg
         num_batches = len(eval_loader)
         avg_loss = total_loss / num_batches
         avg_recon_loss = recons_loss / num_batches
-        avg_recon_loss_s = recons_loss_s / num_batches
-        avg_recon_loss_t = recons_loss_t / num_batches
 
         print(f"[Eval]  [Epoch {epoch}/{self.epochs}] "
               f"Avg: {avg_loss:.4f} | Recon: {avg_recon_loss:.4f} | "
-              f"Recon_S: {avg_recon_loss_s:.4f} | Recon_T: {avg_recon_loss_t:.4f}")
+              )
         
         if self.mlflow_logger is not None:
             self.mlflow_logger.log_metrics({
                 "eval_loss": avg_loss,
-                "eval_recon_loss": avg_recon_loss,
-                "eval_recon_loss_s": avg_recon_loss_s,
-                "eval_recon_loss_t": avg_recon_loss_t
+                "eval_recon_loss": avg_recon_loss
             }, step=epoch)
 
         return (avg_loss, avg_recon_loss)

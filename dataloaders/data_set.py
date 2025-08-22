@@ -7,7 +7,7 @@ from PIL import Image
 from torch.utils.data import Dataset
 
 from utils.csv_utils import read_csv
-from utils.label_utils import get_esc50_pseudo_label, get_dongjak_pseudo_label, get_anoshift_pseudo_label, get_khnp_label
+from utils.label_utils import get_esc50_pseudo_label, get_dongjak_pseudo_label, get_anoshift_pseudo_label, get_khnp_pseudo_label
 
 COLUMN_MAP = {
     'dongjak': (1, 2),
@@ -19,7 +19,7 @@ LABEL_FUNC_MAP = {
     'dongjak': get_dongjak_pseudo_label,
     'esc50': get_esc50_pseudo_label,
     'anoshift': get_anoshift_pseudo_label,
-    'khnp': get_khnp_label
+    'khnp_v1.0': get_khnp_pseudo_label
 }
 
 
