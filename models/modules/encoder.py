@@ -26,7 +26,7 @@ class MLPEncoder(BaseEncoder):
         dropout (float): Dropout rate
         use_batchnorm (bool): whether to use batch normalization
     """
-    def __init__(self, in_dim, hidden_dims, latent_dim, dropout=0.0, use_batchnorm=False):
+    def __init__(self, channels, height, width, in_dim, hidden_dims, latent_dim, dropout=0.0, use_batchnorm=False):
         super(MLPEncoder, self).__init__()
         layers = []
         prev_dim = in_dim
