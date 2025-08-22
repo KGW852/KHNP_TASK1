@@ -42,7 +42,7 @@ class MLPDecoder(BaseDecoder):
             prev_dim = h_dim
 
         # output: out layer
-        out_dim = out_channels * out_seq_len
+        out_dim = channels
         layers.append(nn.Linear(prev_dim, out_dim))
 
         self.mlp = nn.Sequential(*layers)
