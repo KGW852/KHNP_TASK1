@@ -25,13 +25,13 @@ class MLPAETrainer:
 
         # model: ConvergentAE(MLPEncoder + MLPDecoder)
         self.model = MLPAE(
-            enc_in_dim=cfg["mlp_ae"]["in_dim"],
+            channles=cfg["mlp_ae"]["channels"],
+            height=cfg["mlp_ae"]["height"],
+            width=cfg["mlp_ae"]["width"],
             enc_hidden_dims=cfg["mlp_ae"]["enc_hidden_dims"],
             enc_latent_dim=cfg["mlp_ae"]["enc_latent_dim"],
             dec_latent_dim=cfg["mlp_ae"]["dec_latent_dim"],
             dec_hidden_dims=cfg["mlp_ae"]["dec_hidden_dims"],
-            dec_out_channels=cfg["mlp_ae"]["out_channels"],
-            dec_out_seq_len=cfg["mlp_ae"]["out_seq_len"],
             ae_dropout=cfg["mlp_ae"]["dropout"],
             ae_use_batchnorm=cfg["mlp_ae"]["use_batch_norm"]
         ).to(self.device)

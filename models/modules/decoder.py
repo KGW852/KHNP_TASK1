@@ -17,17 +17,18 @@ class MLPDecoder(BaseDecoder):
     """
     MLP Decoder.
     input shape: (batch_size, latent_dim)
-    output: (batch_size, out_channels, out_seq_len)
+    output: (batch_size, channels, height, width)
     Args:
         latent_dim (int): Latent space dimension (output size from the Encoder)
         hidden_dims (list): List of intermediate layer sizes
-        out_channels (int): Number of final channels to reconstruct
-        out_seq_len (int): Final time axis length to reconstruct
         dropout (float): Dropout rate
         use_batchnorm (bool): whether to use batch normalization
     """
     def __init__(self, channels, height, width, latent_dim, hidden_dims, dropout=0.0, use_batchnorm=False):
         super(MLPDecoder, self).__init__()
+        self.channels = channels
+        self.height = height
+        self.width = width
         layers = []
         prev_dim = latent_dim
 
@@ -42,14 +43,14 @@ class MLPDecoder(BaseDecoder):
             prev_dim = h_dim
 
         # output: out layer
-        out_dim = channels
+        out_dim = channels * height * width
         layers.append(nn.Linear(prev_dim, out_dim))
 
         self.mlp = nn.Sequential(*layers)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.mlp(x)                                             # (B, out_channels*out_seq_len)
-        x = x.view(x.size(0), self.out_channels, self.out_seq_len)  # reshape: (B, out_channels, out_seq_len)
+        x = self.mlp(x)                                             # (B, C*H*W)
+        x = x.view(x.size(0), self.channels, self.height, self.width)  # reshape: (B, C, H, W)
         return x
 
 class UpsampleBlock(nn.Module):

@@ -16,13 +16,13 @@ class MLPAE(nn.Module):
     """
     def __init__(self,
                  # AE
-                 enc_in_dim: int,
+                 channels: int,
+                 height: int,
+                 width: int,
                  enc_hidden_dims: list,
                  enc_latent_dim: int,
                  dec_latent_dim: int,
                  dec_hidden_dims: list,
-                 dec_out_channels: int,
-                 dec_out_seq_len: int,
                  ae_dropout: float = 0.0,
                  ae_use_batchnorm: bool = False
                  ):
@@ -30,7 +30,9 @@ class MLPAE(nn.Module):
 
         # MLP Encoder
         self.encoder = MLPEncoder(
-            in_dim=enc_in_dim,
+            channels=channels,
+            height=height,
+            width=width,
             hidden_dims=enc_hidden_dims,
             latent_dim=enc_latent_dim,
             dropout=ae_dropout,
@@ -38,10 +40,11 @@ class MLPAE(nn.Module):
         
         # MLP Decoder
         self.decoder = MLPDecoder(
+            channels=channels,
+            height=height,
+            width=width,
             latent_dim=dec_latent_dim,
             hidden_dims=dec_hidden_dims,
-            out_channels=dec_out_channels,
-            out_seq_len=dec_out_seq_len,
             dropout=ae_dropout,
             use_batchnorm=ae_use_batchnorm)
         

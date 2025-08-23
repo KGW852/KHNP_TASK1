@@ -17,17 +17,17 @@ class BaseEncoder(nn.Module):
 class MLPEncoder(BaseEncoder):
     """
     MLP Encoder.
-    input shape: (batch_size, in_channels, seq_len)
+    input shape: (batch_size, channels, height, width)
     output: (batch_size, latent_dim)
     Args:
-        in_dim (int): The dimension after flattening (C*T)
         hidden_dims (list): List of intermediate layer sizes
         latent_dim (int): Final latent dimension
         dropout (float): Dropout rate
         use_batchnorm (bool): whether to use batch normalization
     """
-    def __init__(self, channels, height, width, in_dim, hidden_dims, latent_dim, dropout=0.0, use_batchnorm=False):
+    def __init__(self, channels, height, width, hidden_dims, latent_dim, dropout=0.0, use_batchnorm=False):
         super(MLPEncoder, self).__init__()
+        in_dim = channels * height * width
         layers = []
         prev_dim = in_dim
 
@@ -47,7 +47,7 @@ class MLPEncoder(BaseEncoder):
         self.mlp = nn.Sequential(*layers)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = x.view(x.size(0), -1)  # (B, C*T)
+        x = x.view(x.size(0), -1)  # (B, C*H*W)
         return self.mlp(x)         # (B, latent_dim)
 
 class TCNEncoder(BaseEncoder):
