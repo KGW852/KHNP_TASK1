@@ -25,7 +25,7 @@ class MLPAETrainer:
 
         # model: ConvergentAE(MLPEncoder + MLPDecoder)
         self.model = MLPAE(
-            channles=cfg["mlp_ae"]["channels"],
+            channels=cfg["mlp_ae"]["channels"],
             height=cfg["mlp_ae"]["height"],
             width=cfg["mlp_ae"]["width"],
             enc_hidden_dims=cfg["mlp_ae"]["enc_hidden_dims"],

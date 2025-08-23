@@ -33,15 +33,15 @@ def get_anoshift_label(file_path):
 
 def get_khnp_label(file_path):
     file_name = os.path.basename(file_path)
-    if 's0' in file_name:
+    if 'S0' in file_name:
         return 0
-    elif 's1' in file_name:
+    elif 'S1' in file_name:
         return 1
-    elif 's2' in file_name:
+    elif 'S2' in file_name:
         return 2
-    elif 's3' in file_name:
+    elif 'S3' in file_name:
         return 3
-    elif 's4' in file_name:
+    elif 'S4' in file_name:
         return 4
     else:
         return -1

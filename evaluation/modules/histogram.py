@@ -43,7 +43,7 @@ class HistPlot:
         plt.title("Anomaly Score Distribution by Class (Histogram)")
         plt.xlabel("Anomaly Score")
         plt.ylabel("Density")
-        plt.xlim(0, 0.5)
+        #plt.xlim(0, 0.5)
         plt.legend()
         plt.tight_layout()
         plt.savefig(save_path, dpi=300)

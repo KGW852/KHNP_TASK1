@@ -57,9 +57,9 @@ class AnomalyScore(nn.Module):
 
     def reconloss_anomaly_score(self, x_recon, x):
         if self.recon_type == 'mse':
-            loss = F.mse_loss(x_recon, x, reduction='sum')
+            loss = F.mse_loss(x_recon, x, reduction='mean')
         else:  # self.loss_type == 'mae'
-            loss = F.l1_loss(x_recon, x, reduction='sum')
+            loss = F.l1_loss(x_recon, x, reduction='mean')
         return loss
 
     def anomaly_score(self, **kwargs) -> torch.Tensor:
